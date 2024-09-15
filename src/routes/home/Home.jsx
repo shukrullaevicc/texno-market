@@ -1,20 +1,23 @@
+import { AiFillHeart, AiFillEye, AiOutlineHeart } from "react-icons/ai";
 import { useState, useEffect } from 'react';
 import { useDispatch } from "react-redux";
-
-import { useGetProductsQuery } from '../../redux/api/productsApi';
+import { Link } from "react-router-dom";
 
 import Container from '../../components/container/Container';
+import { Loading } from '../../utils';
 
+import { useGetProductsQuery } from '../../redux/api/productsApi';
 import { addToFavorite } from '../../redux/slices/favoriteSlice';
 import { addToCart } from '../../redux/slices/cartSlice';
 
-import { AiOutlineShoppingCart } from "react-icons/ai";
-import { FaHeart } from 'react-icons/fa';
+import { Card, Carousel, Button } from "antd";
+
+const { Meta } = Card;
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
   const dispatch = useDispatch();
-  const { data } = useGetProductsQuery();
+  const [products, setProducts] = useState([]);
+  const { data, isLoading } = useGetProductsQuery();
 
   useEffect(() => {
     if (data && data.payload) {
@@ -24,42 +27,52 @@ const Home = () => {
 
   return (
     <>
-      <div className='mt-14 flex flex-col gap-12 text-center'>
+      <div className='mt-14 flex flex-col gap-12'>
         <Container>
-          <div>
-            <h1 className="text-3xl font-semibold text-gray-900">All Products</h1>
-            <div className="grid grid-cols-4 gap-7 mt-14">
-              {products.map((product) => (
-                <div className='max-w-xs flex flex-col items-center justify-center gap-2 relative overflow-hidden group' key={product._id}>
-                  <div className="relative w-full transition-transform duration-300 transform group-hover:scale-110">
-                    <img src={product.product_images[0]} alt="" className="w-full h-72 object-contain" />
-                    <div className="absolute inset-0 flex justify-center items-center gap-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100 z-20">
+          <h1 className="text-3xl font-semibold text-center">All Products</h1>
+          <div className="mt-14">
+            {isLoading ? (<Loading />) : (
+              <div className="max-w-[1400px] mx-auto gap-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {products && products.map((product) => (
+                  <Card key={product._id} style={{width: 300}}
+                    cover={
+                      <Carousel arrows autoplay dots={false} fadeSpeed={1000} style={{ height: "300px" }}>
+                        {product.product_images.map((image) => (<img key={image} alt="example" src={image} />))}
+                      </Carousel>
+                    }
+                  >
+                    <div>
+                      <h1 className="text-[17px] text-gray-900 font-bold">{product.product_name}</h1>
+                      <p className="text-[14px] text-gray-500">{product.product_type}</p>
+                      <strong className="text-blue-500 text-[20px]">${product.sale_price}</strong>
+                      <p className="text-red-500 text-[16px] line-through">${product.original_price}</p>
+                    </div>
+                    <div className="mt-4">
+                      {product.likes > 0 ? (<p className="text-[14px] text-gray-500">{product.likes} likes</p>) : null}
+                    </div>
+                    <div className="mt-4 flex items-center gap-2">
                       <button 
-                        onClick={() => dispatch(addToFavorite(product))} 
-                        className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300`}>
-                        <FaHeart size={20} />
+                        className="text-[15px] p-2 text-white bg-red-500 rounded-lg hover:bg-red-600 focus:bg-red-700 active:bg-red-800 transition-all duration-300"
+                        onClick={() => dispatch(addToCart(product))}
+                      >
+                        Add to cart
                       </button>
-                      <button 
-                        onClick={() => dispatch(addToCart(product))} 
-                        className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl text-green-500 hover:bg-green-500 hover:text-white transition-all duration-300`}>
-                        <AiOutlineShoppingCart size={20} />
+                      <Button 
+                        type="text"
+                        style={{border: "none", boxShadow: "none", backgroundColor: "gray-200", fontSize: "20px", color: "red", padding: "20px 10px", cursor: "pointer"}}
+                        onClick={() => dispatch(addToFavorite(product))}
+                        className=" bg-slate-200 rounded-lg"
+                      >
+                        {product.likedby ? (<AiFillHeart />) : (<AiOutlineHeart />)}
+                      </Button>
+                      <button className="text-[25px] p-2 text-gray-600 bg-slate-200 rounded-lg">
+                        <Link to={`/product/${product._id}`}><AiFillEye /></Link>
                       </button>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-center justify-center gap-2 px-7">
-                    <h3 className="text-lg font-bold text-blue-800">{product.title}</h3>
-                    <div className="w-full flex items-center justify-between gap-2">
-                      <p className="text-lg font-bold text-blue-400">${product.sale_price}</p>
-                      <p className="text-sm font-normal line-through text-gray-500">${product.original_price}</p>
-                      <div className="flex items-center justify-center gap-1">
-                        <AiOutlineShoppingCart />
-                        <p className="text-sm font-normal text-black">{product.number_in_stock}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </Container>
       </div>
