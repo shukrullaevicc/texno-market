@@ -1,19 +1,9 @@
-import { useParams } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import Container from "../../components/container/Container";
-import { useGetSingleProductQuery } from '../../redux/api/singlePageApi';
+import React from 'react'
 
 const SinglePage = () => {
-  const dispatch = useDispatch();
-  const { _id } = useParams();
-  const { data, isLoading } = useGetSingleProductQuery(_id);
-  
-
   return (
-    <Container>
-      
-    </Container>
-  );
-};
+    <div>SinglePage</div>
+  )
+}
 
-export default SinglePage;
+export default SinglePage
