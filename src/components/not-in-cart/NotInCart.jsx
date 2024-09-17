@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import Cart from "../../images/Cart.png";
+
+import Cart from "../../images/cart.png";
 
 const NotInCart = () => {
    return (
