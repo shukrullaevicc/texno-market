@@ -31,6 +31,11 @@ const RouteController = () => {
     },
 
     {
+      path: 'single-product/:id',
+      element: <Suspense fallback={<Loading />}><SinglePage /></Suspense>,
+    },
+
+    {
       path: 'cart',
       element: <Suspense fallback={<Loading />}><Cart /></Suspense>
     },

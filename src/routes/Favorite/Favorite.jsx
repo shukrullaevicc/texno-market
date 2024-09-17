@@ -1,57 +1,69 @@
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector, useDispatch } from "react-redux";
+import { AiFillHeart, AiOutlineShoppingCart } from "react-icons/ai";
 
-import { AiOutlineShoppingCart, AiFillStar, AiFillDelete } from "react-icons/ai";
+import { Card, Button, Carousel } from "antd";
 
 import { addToCart } from "../../redux/slices/cartSlice";
 import { deleteFavorite } from "../../redux/slices/favoriteSlice";
 
 import Container from "../../components/container/Container";
+import NotInFavorite from "../../components/not-in-favorite/NotInFavorite";
+
+const { Meta } = Card;
 
 const Favorites = () => {
   const favorite = useSelector((state) => state.favorite.favorite);
   const dispatch = useDispatch();
 
   return (
-    <div className='mt-14 flex flex-col gap-12 text-center'>
-      <Container>
-        <div className="container">
-          <h1 className="text-3xl font-semibold text-gray-900">Favorites</h1>
-          <div className="grid grid-cols-4 gap-7 mt-14">
-            {favorite.map((product) => (
-              <div className='max-w-xs flex flex-col items-center justify-center gap-2 relative overflow-hidden group' key={product._id}>
-                <div className="relative w-full transition-transform duration-300 transform group-hover:scale-110">
-                  <img src={product.product_images[0]} alt="" className="w-full h-72 object-contain" />
-                  <div className="absolute inset-0 flex justify-center items-center gap-4 opacity-0 transition-opacity duration-500 group-hover:opacity-100 z-20">
-                    <button 
-                      onClick={() => dispatch(deleteFavorite(product))} 
-                      className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl text-red-500 hover:bg-red-500 hover:text-white transition-all duration-300`}>
-                      <AiFillDelete size={20} />
-                    </button>
-                    <button 
-                      onClick={() => dispatch(addToCart(product))} 
-                      className={`p-3 rounded-full bg-white shadow-lg hover:shadow-xl text-green-500 hover:bg-green-500 hover:text-white transition-all duration-300`}>
-                      <AiOutlineShoppingCart size={20} />
-                    </button>
-                    </div>
-                </div>
-                <div className="flex flex-col items-center justify-center gap-2 px-7">
-                  <h3 className="text-lg font-bold text-blue-800">{product.title}</h3>
-                  <div className="w-full flex items-center justify-between gap-2">
-                    <p className="text-lg font-bold text-blue-400">${product.sale_price}</p>
-                    <p className="text-sm font-normal line-through text-gray-500">${product.original_price}</p>
-                    <div className="flex items-center justify-center gap-1">
-                      <AiOutlineShoppingCart />
-                      <p className="text-sm font-normal text-gray-500">{product.number_in_stock}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Container>
-    </div>
-  )
-}
+    <Container>
+      <div className='mt-8 flex flex-col gap-12'>
+        {
+          favorite.length !== 0 ? (<h1 className="text-3xl font-semibold text-left">Favorites</h1>) : null
+        }
+        <div className="">
+          {favorite.length === 0 ? (<NotInFavorite /> ) : (
+            <div className="max-w-[1400px] mx-auto gap-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {favorite.map((product) => (
+                <Card key={product._id} className="relative shadow-lg border rounded-lg" style={{ width: 300 }}>
+                  <button className="absolute top-2 right-2 text-xl text-red-500 hover:text-red-600 transition" onClick={() => dispatch(deleteFavorite(product))}>
+                    <AiFillHeart />
+                  </button>
 
-export default Favorites
+                  <Carousel autoplay arrows dots={false}>
+                    {product.product_images.map((image) => (<img key={image} src={image} alt={product.product_name}className="h-60 object-cover rounded-t-lg"/>))}
+                  </Carousel>
+
+                  <div className="p-4">
+                    <h2 className="text-[17px] font-semibold">{product.product_name}</h2>
+                    <div className="bg-yellow-100 text-yellow-600 mt-2 px-2 py-1 text-sm rounded-md">
+                      dan {product.sale_price.toLocaleString()} so'm/oyga
+                    </div>
+                    <div className="flex items-center gap-2 mt-2">
+                      <p className="text-gray-400 line-through text-sm">
+                        {product.original_price.toLocaleString()} so'm
+                      </p>
+                      <p className="text-red-500 font-semibold text-lg">
+                        {product.sale_price.toLocaleString()} so'm
+                      </p>
+                    </div>
+
+                    <Button
+                      className="mt-4 w-full text-white bg-yellow-400 hover:bg-yellow-500 focus:bg-yellow-600 active:bg-yellow-700 transition-colors py-2"
+                      onClick={() => dispatch(addToCart(product))}
+                    >
+                      <AiOutlineShoppingCart className="mr-2" />
+                      Savatga
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </Container>
+  );
+};
+
+export default Favorites;

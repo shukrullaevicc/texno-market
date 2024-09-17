@@ -9,7 +9,7 @@ function App() {
   return (
     <>
       {
-        pathname === '/' || pathname === '/cart' || pathname === '/favorite' ? <Nav /> : null
+        pathname === '/' || pathname === '/cart' || pathname === '/favorite' || pathname === `/single-product/${pathname.split('/')[2]}` ? <Nav /> : null
       }
       <RouteController />
     </>

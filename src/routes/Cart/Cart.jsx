@@ -1,87 +1,99 @@
-import { useEffect } from 'react';  
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
-import x from "../../images/x.svg";
 
 import { addToCart, removeFromCart, calculateTotals, deleteCart } from '../../redux/slices/cartSlice';
+
+import x from "../../images/x.svg";
+
+import NotInCart from '../../components/not-in-cart/NotInCart';
+import Container from '../../components/container/Container';
 
 const Cart = () => {
   const dispatch = useDispatch();
   const cart = useSelector(state => state.cart.cart);
   const total = useSelector(state => state.cart.total) || 0;
-  const shippingFee = 20;
 
   useEffect(() => {
     dispatch(calculateTotals());
   }, [cart, dispatch]);
 
+  if (cart.length === 0) {
+    return <NotInCart />;
+  }
+
   return (
-    <div className="flex flex-col items-end p-5 min-h-screen">
-      <table className="w-full border-collapse mb-5">
+    <Container>
+      <div className="flex flex-col lg:flex-row justify-between p-5">
+        <div className="w-full">
+          <h1 className="text-3xl font-bold mb-5">Savat</h1>
+          <div className="bg-white rounded-lg p-5">
+            {cart.map((product) => (
+              <div key={product._id} className="flex justify-between gap-8 items-center border-b border-gray-200 py-4">
+                <div className="flex items-center gap-4">
+                  <img src={product.product_images[0]} alt={product.name} className="w-16 h-16 object-cover rounded-md" />
+                  <div>
+                    <h2 className="text-lg font-semibold">{product.name}</h2>
+                    <p className="text-gray-500">Narx: {product.sale_price.toLocaleString()}$</p>
+                    <p className="text-gray-500">Yetkazib berish muddati: Tashkent bo'ylab 24 soat ichida</p>
+                  </div>
+                </div>
 
-        <thead>
-          <tr className="bg-blue-500 text-white">
-            <th className="p-4 text-center border border-gray-300">Product</th>
-            <th className="p-4 text-center border border-gray-300">Price</th>
-            <th className="p-4 text-center border border-gray-300">Quantity</th>
-            <th className="p-4 text-center border border-gray-300">Total</th>
-            <th className="p-4 text-center border border-gray-300">Remove</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {cart.map((product) => (
-            <tr key={product._id} className="bg-white">
-
-              <td className="p-4 flex items-center gap-2 justify-center border border-gray-300">
-                <img src={product.product_images[0]} alt="" width="50" height="50" className="object-cover" />
-                {product.name}
-              </td>
-
-              <td className="p-4 text-center border border-gray-300">${product.sale_price}</td>
-
-              <td className="p-4 text-center border border-gray-300">
-                <div className="flex items-center justify-center gap-2">
-                  <button onClick={() => dispatch(removeFromCart(product))} className="flex items-center justify-center p-2 bg-gray-200 text-blue-400 rounded">
+                <div className="flex items-center gap-2">
+                  <button onClick={() => dispatch(removeFromCart(product))} className="p-2 bg-gray-200 rounded">
                     <AiOutlineMinus />
                   </button>
-                  
-                  <p className="text-lg">{product.quantity}</p>
 
-                  <button onClick={() => dispatch(addToCart(product))} className="flex items-center justify-center p-2 bg-gray-200 text-blue-400 rounded">
+                  <span className="text-lg">{product.quantity}</span>
+                  
+                  <button onClick={() => dispatch(addToCart(product))} className="p-2 bg-gray-200 rounded">
                     <AiOutlinePlus />
                   </button>
                 </div>
-              </td>
-              <td className="p-4 text-center border border-gray-300"> ${(product.sale_price * product.quantity).toFixed(2)} </td>
 
-              <td className="p-4 text-center border border-gray-300">
-                <button className="p-2 bg-red-100 rounded-full"> <img onClick={() => dispatch(deleteCart(product))} src={x} alt="Remove" /> </button>
-              </td>
+                <div className="text-lg font-semibold">
+                  {(product.sale_price * product.quantity).toLocaleString()}$
+                </div>
 
-            </tr>
-          ))}
-        </tbody>
-        
-      </table>
-
-      <div className="w-full max-w-xs bg-white p-5 rounded-lg shadow-lg mt-5 text-right">
-        <div className="flex justify-between py-2 border-b border-gray-200">
-          <span className="text-base text-gray-600">Subtotal</span>
-          <span className="text-base text-blue-500">${total.toFixed(2)}</span>
+                <button onClick={() => dispatch(deleteCart(product))} className="p-2 bg-gray-100 rounded-full">
+                  <img src={x} alt="Remove" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="flex justify-between py-2 border-b border-gray-200">
-          <span className="text-base text-gray-600">Shipping Fee</span>
-          <span className="text-base text-blue-500">${shippingFee}</span>
-        </div>
-        <div className="flex justify-between py-2 font-bold text-lg">
-          <span className="text-base text-gray-600">Total</span>
-          <span className="text-blue-500">${(total + shippingFee).toFixed(2)}</span>
+
+        <div className="w-full lg:w-1/3 mt-10">
+          <div className="rounded-lg bg-gray-100 p-5">
+            <h2 className="text-2xl font-bold mb-5">Jami</h2>
+
+            <div className="flex justify-between text-lg mb-3">
+              <span>Tovarlar soni</span>
+              <span>{cart.length} dona</span>
+            </div>
+
+            <div className="flex justify-between text-lg mb-3">
+              <span>Yetkazib berish</span>
+              <span className="text-green-500">Bepul</span>
+            </div>
+
+            <div className="flex justify-between text-xl font-bold">
+              <span>Jami</span>
+              <span>{total.toLocaleString()}$</span>
+            </div>
+
+            <button className="bg-yellow-400 text-white w-full py-3 mt-5 rounded-lg text-lg font-bold">
+              Muddatsiz to'lovga olish
+            </button>
+
+            <button className="bg-white border border-gray-300 text-black w-full py-3 mt-3 rounded-lg text-lg">
+              Karta orqali sotib olish
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
-}
+};
 
 export default Cart;

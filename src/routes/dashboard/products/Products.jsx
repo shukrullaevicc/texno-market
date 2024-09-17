@@ -66,9 +66,7 @@ const Products = () => {
     <div className="p-6 bg-gray-100 h-full">
       <h1 className="text-3xl font-bold mb-6 text-center">Products</h1>
 
-      {isLoading ? (
-        <Spin size="large" className="flex justify-center items-center h-full" />
-      ) : (
+      {isLoading ? (<Spin size="large" className="flex justify-center items-center h-full" />) : (
         <>
           <Input
             placeholder="Search by name or category"
