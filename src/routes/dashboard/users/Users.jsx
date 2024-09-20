@@ -1,7 +1,7 @@
 import { Table, notification } from 'antd';
 import { useEffect, useState } from 'react';
 import { useUserQuery } from '../../../redux/api/userApi';
-import { Loading } from '../../../utils'; // Assuming this is a loading component
+import { Loading } from '../../../utils';
 
 const Users = () => {
   const [userData, setUserData] = useState([]);

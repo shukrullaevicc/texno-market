@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useDispatch } from "react-redux";
 import { Link } from 'react-router-dom';
 import { AiFillHeart, AiOutlineHeart, AiOutlineShoppingCart } from "react-icons/ai";
+import { Card, Carousel, Button } from "antd";
 
 import { useGetProductsQuery } from '../../redux/api/productsApi';
-import { addToFavorite } from '../../redux/slices/favoriteSlice';
+import { useLikeProductMutation, useUnLikeProductMutation } from '../../redux/api/userApi';
+import { addToFavorite, deleteFavorite } from '../../redux/slices/favoriteSlice';
+import { handleToLike, handleToUnlike } from '../../redux/slices/favoriteSlice';
 import { addToCart } from '../../redux/slices/cartSlice';
-
-import { Card, Carousel, Button } from "antd";
 
 import Container from '../../components/container/Container';
 import { Loading } from '../../utils';
@@ -18,6 +19,31 @@ const Home = () => {
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
   const { data, isLoading } = useGetProductsQuery();
+  const [likeProduct] = useLikeProductMutation();
+  const [unLikeProduct] = useUnLikeProductMutation();
+
+  const handleLikeToggle = async (product) => {
+    try {
+      const updatedProduct = { ...product, liked: !product.liked };
+
+      setProducts((prevProducts) =>
+        prevProducts.map((p) => (p._id === product._id ? updatedProduct : p))
+      );
+
+      if (product.liked) {
+        await unLikeProduct(product._id).unwrap();
+        dispatch(deleteFavorite(product));
+        dispatch(handleToUnlike(product));
+      } else {
+        await likeProduct(product._id).unwrap();
+        dispatch(addToFavorite(product));
+        dispatch(handleToLike(product));
+      }
+    } 
+    catch (error) {
+      console.error('Failed to toggle like status:', error);
+    }
+  };
 
   useEffect(() => {
     if (data && data.payload) {
@@ -34,12 +60,13 @@ const Home = () => {
             <div className="max-w-[1400px] mx-auto gap-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {products && products.map((product) => (
                 <Card key={product._id} className="relative shadow-lg border rounded-lg" style={{ width: 300 }}>
-                  <button className="absolute top-2 right-2 text-xl text-gray-400 hover:text-red-500 transition" onClick={() => dispatch(addToFavorite(product))}>
-                    {product.likedby ? <AiFillHeart /> : <AiOutlineHeart />}
+                  <button className="absolute top-2 right-2 text-xl text-red-700 transition" onClick={() => handleLikeToggle(product)}>
+                    {
+                      product.liked ? (<AiFillHeart />) : (<AiOutlineHeart />)
+                    }
                   </button>
 
                   <Link to={`/single-product/${product._id}`}>
-
                     <Carousel autoplay arrows dots={false}>
                       {product.product_images.map((image) => (<img key={image} src={image} alt={product.product_name} className="h-60 object-cover rounded-t-lg" />))}
                     </Carousel>
@@ -54,11 +81,9 @@ const Home = () => {
                         <p className="text-red-500 font-semibold text-lg">{product.original_price}$</p>
                       </div>
                     </div>
-
                   </Link>
 
-                  <Button
-                    className="mt-4 w-full text-white bg-yellow-400 hover:bg-yellow-500 focus:bg-yellow-600 active:bg-yellow-700 transition-colors py-2"
+                  <Button className="mt-4 w-full text-white bg-yellow-400 hover:bg-yellow-500 focus:bg-yellow-600 active:bg-yellow-700 transition-colors py-2"
                     onClick={() => dispatch(addToCart(product))}
                   >
                     <AiOutlineShoppingCart className="mr-2" />

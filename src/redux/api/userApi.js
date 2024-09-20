@@ -8,7 +8,21 @@ const userApi = api.injectEndpoints({
             method: "GET"
          }),
       }),
+
+      likeProduct: build.mutation({
+         query: (id) => ({
+            url: `/product/${id}/like`,
+            method: "PATCH",
+         }),
+      }),
+
+      unLikeProduct: build.mutation({
+         query: (id) => ({
+            url: `/product/${id}/unlike`,
+            method: "PATCH",
+         }),
+      }),
    }),
 });
 
-export const { useUserQuery } = userApi
+export const { useUserQuery, useLikeProductMutation, useUnLikeProductMutation } = userApi
