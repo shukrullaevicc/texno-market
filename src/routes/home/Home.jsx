@@ -1,47 +1,46 @@
+import { useDispatch, useSelector } from "react-redux";
 import { useState, useEffect } from 'react';
-import { useDispatch } from "react-redux";
 import { Link } from 'react-router-dom';
 import { AiFillHeart, AiOutlineHeart, AiOutlineShoppingCart } from "react-icons/ai";
-import { Card, Carousel, Button } from "antd";
 
-import { useGetProductsQuery } from '../../redux/api/productsApi';
-import { useLikeProductMutation, useUnLikeProductMutation } from '../../redux/api/userApi';
-import { addToFavorite, deleteFavorite } from '../../redux/slices/favoriteSlice';
-import { handleToLike, handleToUnlike } from '../../redux/slices/favoriteSlice';
+import { Card, Carousel, Button, notification } from "antd";
+
+import { useGetProductsQuery, useLikeProductMutation, useUnLikeProductMutation } from '../../redux/api/productsApi';
 import { addToCart } from '../../redux/slices/cartSlice';
 
-import Container from '../../components/container/Container';
 import { Loading } from '../../utils';
+import Container from '../../components/container/Container';
 
 const { Meta } = Card;
 
 const Home = () => {
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
+  const { username } = useSelector((state) => state.auth);
   const { data, isLoading } = useGetProductsQuery();
-  const [likeProduct] = useLikeProductMutation();
-  const [unLikeProduct] = useUnLikeProductMutation();
+  const [like] = useLikeProductMutation();
+  const [unlike] = useUnLikeProductMutation();
 
-  const handleLikeToggle = async (product) => {
+  const likeProduct = async (id) => {
     try {
-      const updatedProduct = { ...product, liked: !product.liked };
-
-      setProducts((prevProducts) =>
-        prevProducts.map((p) => (p._id === product._id ? updatedProduct : p))
-      );
-
-      if (product.liked) {
-        await unLikeProduct(product._id).unwrap();
-        dispatch(deleteFavorite(product));
-        dispatch(handleToUnlike(product));
-      } else {
-        await likeProduct(product._id).unwrap();
-        dispatch(addToFavorite(product));
-        dispatch(handleToLike(product));
-      }
+      await like(id);
+      notification.success({
+        message: `You have liked ${username}'s product!`,
+      })
     } 
     catch (error) {
-      console.error('Failed to toggle like status:', error);
+      console.error("Error liking the product:", error);
+    }
+  };
+
+  const unlikeProduct = async (id) => {
+    try {
+      await unlike(id);
+      notification.success({
+        message: `You have unliked ${username}'s product!`,
+      })
+    } catch (error) {
+      console.error("Error unliking the product:", error);
     }
   };
 
@@ -60,10 +59,14 @@ const Home = () => {
             <div className="max-w-[1400px] mx-auto gap-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {products && products.map((product) => (
                 <Card key={product._id} className="relative shadow-lg border rounded-lg" style={{ width: 300 }}>
-                  <button className="absolute top-2 right-2 text-xl text-red-700 transition" onClick={() => handleLikeToggle(product)}>
-                    {
-                      product.liked ? (<AiFillHeart />) : (<AiOutlineHeart />)
-                    }
+                  
+                  <button className="absolute top-2 right-2 text-xl text-red-700 transition">
+                  {
+                    product?.likedby.includes(username) ? 
+                    <AiFillHeart onClick={() => unlikeProduct(product._id)}  className='top-4 right-4 text-2xl text-red-600'/> 
+                  :
+                    <AiOutlineHeart onClick={() => likeProduct(product._id)} className='top-4 right-4 text-2xl'/>
+                  }
                   </button>
 
                   <Link to={`/single-product/${product._id}`}>
@@ -86,8 +89,7 @@ const Home = () => {
                   <Button className="mt-4 w-full text-white bg-yellow-400 hover:bg-yellow-500 focus:bg-yellow-600 active:bg-yellow-700 transition-colors py-2"
                     onClick={() => dispatch(addToCart(product))}
                   >
-                    <AiOutlineShoppingCart className="mr-2" />
-                    Savatga
+                    <AiOutlineShoppingCart className="mr-2" /> Savatga
                   </Button>
                 </Card>
               ))}

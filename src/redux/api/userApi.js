@@ -2,27 +2,46 @@ import { api } from "./index";
 
 const userApi = api.injectEndpoints({
    endpoints: (build) => ({
-      user: build.query({
+
+      // USER PROFILE
+      getProfile: build.query({
          query: () => ({
-            url: "/admin/registered-users",
-            method: "GET"
+         url: "/auth/profile",
          }),
       }),
 
-      likeProduct: build.mutation({
-         query: (id) => ({
-            url: `/product/${id}/like`,
-            method: "PATCH",
+      // USERS
+      getUsers: build.query({
+         query: () => ({
+         url: "/admin/registered-users",
          }),
+         providesTags: ["USERS"],
       }),
 
-      unLikeProduct: build.mutation({
-         query: (id) => ({
-            url: `/product/${id}/unlike`,
-            method: "PATCH",
+      // DELETE USER
+      deleteUser: build.mutation({
+         query: ({ id }) => ({
+         url: `/admin/delete-user/${id}`,
+         method: "DELETE",
          }),
+         invalidatesTags: ["USERS"],
+      }),
+
+      // PROMOTE USER
+      promoteUser: build.mutation({
+         query: (body) => ({
+         url: `/admin/add-admin`,
+         method: "POST",
+         body,
+         }),
+         invalidatesTags: ["USERS"],
       }),
    }),
 });
 
-export const { useUserQuery, useLikeProductMutation, useUnLikeProductMutation } = userApi
+export const {
+  useGetProfileQuery,
+  useGetUsersQuery,
+  useDeleteUserMutation,
+  usePromoteUserMutation,
+} = userApi;

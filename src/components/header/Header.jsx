@@ -3,13 +3,13 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 
 import { NavLink } from "react-router-dom";
 
-import { useProfileApiQuery } from "../../redux/api/profileApi";
+import { useGetProfileQuery } from "../../redux/api/userApi";
 import { Loading } from "../../utils"
 
 const { Header } = Layout;
 
 const HeaderComponent = ({ collapsed, handleToggleCollapsed }) => {
-   const { data: profile } = useProfileApiQuery();
+   const { data: profile } = useGetProfileQuery();
 
    const firstName = profile?.payload.first_name || "User";
 

@@ -25,7 +25,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      dispatch(login({ token: data?.payload?.token }));
+      dispatch(login({ token: data?.payload?.token, username: data?.payload?.user.username }));
       notification.success({
         message: "Successfully logged in! 😊",
         description: "Welcome back! You are being redirected to the dashboard.",

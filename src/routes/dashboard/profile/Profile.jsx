@@ -1,9 +1,9 @@
 import { Avatar } from "antd";
 
-import { useProfileApiQuery } from "../../../redux/api/profileApi";
+import { useGetProfileQuery } from "../../../redux/api/userApi";
 
 const Profile = () => {
-  const { data: profile } = useProfileApiQuery();
+  const { data: profile } = useGetProfileQuery();
 
   const user = profile?.payload
 

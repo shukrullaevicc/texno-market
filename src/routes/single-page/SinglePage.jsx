@@ -3,7 +3,7 @@ import { Carousel } from 'antd';
 import { useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
-import { useGetSingleProductQuery } from "../../redux/api/singePageApi";
+import { useGetProductDetailsQuery } from '../../redux/api/productsApi';
 
 import Container from "../../components/container/Container";
 import { Loading } from "../../utils";
@@ -11,7 +11,7 @@ import { Loading } from "../../utils";
 const SinglePage = () => {
   const carousel = useRef(null);
   const { id } = useParams();
-  const { data: product, isLoading } = useGetSingleProductQuery(id);
+  const { data: product, isLoading } = useGetProductDetailsQuery(id);
   const [mainImageIndex, setMainImageIndex] = useState(0);
 
   const handleImageClick = (index) => {

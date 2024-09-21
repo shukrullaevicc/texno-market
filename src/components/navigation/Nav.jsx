@@ -1,3 +1,5 @@
+import './Nav.css';
+
 import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
@@ -6,10 +8,20 @@ import { HeartOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 
 import Container from "../container/Container";
 
+import { useGetProfileQuery } from "../../redux/api/userApi";
+
 const Nav = () => {
   const cartLength = useSelector((state) => state.cart.cart);
-  const favouriteLength = useSelector((state) => state.favorite.favorite);
   const [hasShadow, setHasShadow] = useState(false);
+  const [isUzbek, setIsUzbek] = useState(false);
+  const [favouriteLength, setFavouriteLength] = useState(0);
+  const { data } = useGetProfileQuery();
+
+  useEffect(() => {
+    if (data && data.payload) {
+      setFavouriteLength(data.payload.liked);
+    }
+  }, [data]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,6 +38,10 @@ const Nav = () => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
+
+   const toggleLanguage = () => {
+    setIsUzbek((prev) => !prev);
+  };
 
   return (
     <nav className={`bg-white py-4 sticky top-0 z-50 transition-shadow duration-300 ${hasShadow ? "shadow-md" : ""}`}>
@@ -77,8 +93,17 @@ const Nav = () => {
               <NavLink to="/auth">Login</NavLink>
             </button>
 
-            <div className="flex items-center text-black gap-2">
-              <span>РУС / UZB</span>
+            <div className="flex items-center gap-2">
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" checked={isUzbek} onChange={toggleLanguage} className="sr-only"/>
+                <div className={`w-16 h-8 rounded-full ${isUzbek ? "bg-yellow-400" : "bg-gray-400"} transition duration-300 flex items-center`}>
+                  <div className={`w-8 h-8 bg-white rounded-full transition-transform duration-300 ${isUzbek ? "translate-x-8" : "translate-x-0"} flex items-center justify-center`}>
+                    <span className={`text-xs font-semibold ${isUzbek ? "text-black" : "text-black"}`}>
+                      {isUzbek ? "РУС" : "UZB"}
+                    </span>
+                  </div>
+                </div>
+              </label>
             </div>
 
           </div>

@@ -1,11 +1,11 @@
 import { Table, notification } from 'antd';
 import { useEffect, useState } from 'react';
-import { useUserQuery } from '../../../redux/api/userApi';
+import { useGetUsersQuery } from '../../../redux/api/userApi';
 import { Loading } from '../../../utils';
 
 const Users = () => {
   const [userData, setUserData] = useState([]);
-  const { data: users, isLoading, error } = useUserQuery();
+  const { data: users, isLoading, error } = useGetUsersQuery();
 
   const columns = [
     {

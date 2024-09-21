@@ -24,7 +24,7 @@ const Register = () => {
 
   useEffect(() => {
     if(isSuccess){
-      dispatch(register({ token: data?.payload?.token }));
+      dispatch(register({ token: data?.payload?.token, username: data.payload.user.username }));
       notification.success({
         message: "Successfully logged in! 😊",
         description: "Welcome back! You are being redirected to the dashboard.",
