@@ -53,7 +53,7 @@ const Home = () => {
   return (
     <div className='mt-8 flex flex-col gap-12'>
       <Container>
-        <h1 className="text-3xl font-semibold">All Products</h1>
+        <h1 className="text-3xl font-semibold">Barcha mahsulotlar</h1>
         <div className="mt-8">
           {isLoading ? (<Loading />) : (
             <div className="max-w-[1400px] mx-auto gap-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
