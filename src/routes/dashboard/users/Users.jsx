@@ -1,11 +1,16 @@
-import { Table, notification } from 'antd';
 import { useEffect, useState } from 'react';
-import { useGetUsersQuery } from '../../../redux/api/userApi';
+
+import { Table, notification, Button } from 'antd';
+
+import { useGetUsersQuery, useDeleteUserMutation, usePromoteUserMutation } from '../../../redux/api/userApi';
+
 import { Loading } from '../../../utils';
 
 const Users = () => {
   const [userData, setUserData] = useState([]);
   const { data: users, isLoading, error } = useGetUsersQuery();
+  const [deleteUser] = useDeleteUserMutation();
+  const [promoteUser] = usePromoteUserMutation();
 
   const columns = [
     {
@@ -21,6 +26,14 @@ const Users = () => {
       dataIndex: 'registeredAt',
       render: (date) => new Date(date).toLocaleDateString(),
     },
+    {
+      title: "Actions",
+      render: (user) => 
+        <div className='flex gap-4'>
+          <Button onClick={() => {promoteUser({username: user.username})}}  type='primary'>Promote</Button>
+          <Button onClick={() => {deleteUser({id: user._id})}} danger type='primary'>Delete</Button>
+        </div>
+    }
   ];
 
   useEffect(() => {
