@@ -65,7 +65,7 @@ const SiderComponent = ({ collapsed }) => {
          
          <Modal
             title="Confirm Sign Out"
-            visible={isModalVisible}
+            open={isModalVisible}
             onOk={handleOk}
             onCancel={handleCancel}
             okText="Yes"

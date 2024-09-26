@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import { AiOutlineCloudUpload } from "react-icons/ai";
+import { AiOutlineClose } from "react-icons/ai";
 import { Button, Form, Input, InputNumber, Select, notification } from "antd";
 
 import { useGetCategoriesQuery, useGetProductTypeQuery } from "../../redux/api/categoryApi";
@@ -9,6 +10,7 @@ import { useCreateProductMutation } from "../../redux/api/productsApi";
 const { TextArea } = Input;
 
 const CreateProducts = () => {
+   const [productURLImages, setProductURLImages] = useState([]);
    const [productsImages, setProductsImages] = useState([]);
    const [create, { data: createData, error, isError, isLoading }] = useCreateProductMutation();
    const { data: categoryData } = useGetCategoriesQuery();
@@ -51,6 +53,12 @@ const CreateProducts = () => {
       console.log(error);
    };
 
+   useEffect(() => {
+      if(productsImages.length > 0){
+         setProductURLImages(Array.from(productsImages))
+      }
+   }, [productsImages])
+
    return (
       <div className="p-4 max-w-lg mx-auto">
          <Form
@@ -75,13 +83,13 @@ const CreateProducts = () => {
                   rules={[{ required: true, message: "Please select a category!" }]}
                >
                   <Select
-                  mode="tags"
-                  maxCount={1}
-                  options={categoryData?.payload?.map((category) => ({
-                     key: category,
-                     label: category,
-                     value: category,
-                  }))}
+                     mode="tags"
+                     maxCount={1}
+                     options={categoryData?.payload?.map((category) => ({
+                        key: category,
+                        label: category,
+                        value: category,
+                     }))}
                   />
                </Form.Item>
 
@@ -91,13 +99,13 @@ const CreateProducts = () => {
                   rules={[{ required: true, message: "Please select a product type!" }]}
                >
                   <Select
-                  mode="tags"
-                  maxCount={1}
-                  options={productTypeData?.payload?.map((type) => ({
-                     key: type,
-                     label: type,
-                     value: type,
-                  }))}
+                     mode="tags"
+                     maxCount={1}
+                     options={productTypeData?.payload?.map((type) => ({
+                        key: type,
+                        label: type,
+                        value: type,
+                     }))}
                   />
                </Form.Item>
             </div>
@@ -141,17 +149,35 @@ const CreateProducts = () => {
                name="product_images"
                rules={[{ required: true, message: "Please upload product images!" }]}
             >
-               <div className="flex flex-col items-center justify-center border border-dashed border-gray-400 rounded-lg py-6">
-                  <AiOutlineCloudUpload className="text-5xl text-sky-500" />
-                  <p className="text-lg">Click or drag file to this area to upload</p>
-                  <p className="text-sm text-gray-400">PNG, JPG, JPEG, GIF, WEBP, MP4 formats accepted</p>
-                  <input
-                     type="file"
-                     multiple
-                     accept="image/jpeg,image/webp,image/png,image/jpg,video/mp4"
-                     className="mt-2"
-                     onChange={(e) => setProductsImages(Array.from(e.target.files))}
+               <div>
+                  <div className="flex flex-col items-center justify-center border border-dashed border-gray-400 rounded-lg py-6 relative">
+                     <AiOutlineCloudUpload className="text-5xl text-sky-500" />
+                     <p className="text-lg">Click or drag file to this area to upload</p>
+                     <p className="text-sm text-gray-400">PNG, JPG, JPEG, GIF, WEBP, MP4 formats accepted</p>
+                     <input
+                        className="mt-2 absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer appearance-none"
+                        onChange={(e) => setProductsImages(Array.from(e.target.files))}
+                        type="file"
+                        multiple
+                        accept="image/jpeg,image/webp,image/png,image/jpg,video/mp4"
                      />
+                  </div>
+                  <div className="flex gap-5">
+                     {
+                        productURLImages?.map((image, index) => {
+                           const url = URL.createObjectURL(image);
+                           return <div key={index} className="w-[80px] h-[80px] rounded-lg overflow-hidden relative my-4">
+                              <img src={url} alt={`Product Image ${index + 1}`} className="w-full h-full object-cover"/>
+                              <div
+                                 className="absolute top-0 left-0 w-full h-full bg-gray-900/50 flex items-center justify-center"
+                                 onClick={() => setProductURLImages(productURLImages.filter((_, i) => i !== index))}
+                              >
+                                 <AiOutlineClose className="text-white text-2xl cursor-pointer" />
+                              </div>
+                           </div>
+                        })
+                     }
+                  </div>
                </div>
             </Form.Item>
 
